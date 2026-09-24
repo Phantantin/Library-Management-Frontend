@@ -1,0 +1,5 @@
+"use client";
+import * as Dialog from "@radix-ui/react-dialog";
+import {X} from "lucide-react";
+import {useI18n} from "@/providers/i18n-provider";
+export function Modal({open,onOpenChange,title,description,children}:{open:boolean;onOpenChange:(open:boolean)=>void;title:string;description:string;children:React.ReactNode}){const{t}=useI18n();return <Dialog.Root open={open} onOpenChange={onOpenChange}><Dialog.Portal><Dialog.Overlay className="fixed inset-0 z-50 bg-black/50"/><Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-[calc(100%-2rem)] max-w-xl -translate-x-1/2 -translate-y-1/2 rounded-lg border bg-card p-6 shadow-xl max-h-[90dvh] overflow-y-auto"><Dialog.Title className="text-xl font-semibold pr-8">{t(title)}</Dialog.Title><Dialog.Description className="text-muted-foreground mt-2 mb-6">{t(description)}</Dialog.Description>{children}<Dialog.Close aria-label={t("Close dialog")} className="absolute right-4 top-4 p-2 hover:bg-muted rounded-md"><X size={18}/></Dialog.Close></Dialog.Content></Dialog.Portal></Dialog.Root>;}

@@ -1,0 +1,12 @@
+"use client";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { useEffect } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { post } from "@/lib/api";
+import type { PaymentDTO } from "@/types/domain";
+import { Loading } from "@/components/ui/states";
+import { Badge, statusTone } from "@/components/ui/badge";
+import { label } from "@/lib/utils";
+import {useI18n} from "@/providers/i18n-provider";
+export function PaymentReturn({ expectedId }: { expectedId: number }) {const{t,money}=useI18n();const params=useSearchParams();const paymentId=params.get("razorpay_payment_id");const verify=useMutation({mutationFn:()=>post<PaymentDTO>("/api/payments/verify",{razorpayPaymentId:paymentId})});useEffect(()=>{if(paymentId&&!verify.isPending&&!verify.data&&!verify.error)verify.mutate()},[paymentId,verify]);if(!paymentId)return <div className="panel"><h1 className="heading">{t("Payment not completed")}</h1><p className="text-muted-foreground mt-3">{t("No provider payment reference was returned. Your account has not been marked paid.")}</p><Link href="/dashboard/payments" className="text-primary block mt-5">{t("View payment history")} →</Link></div>;if(verify.isPending)return <><h1 className="heading">{t("Verifying payment")}</h1><p className="text-muted-foreground mt-3">{t("We are checking the payment directly with the provider.")}</p><Loading/></>;if(verify.error)return <div className="panel"><h1 className="heading">{t("Payment verification pending")}</h1><p role="alert" className="text-destructive mt-3">{t(verify.error.message)}</p><p className="text-sm text-muted-foreground mt-3">{t("Checkout reference: {id}. No account benefit has been granted from this browser response.",{id:expectedId})}</p><Link href="/dashboard/payments" className="text-primary block mt-5">{t("Check payment history")} →</Link></div>;return <div className="panel"><Badge tone={statusTone(verify.data?.status??"PENDING")}>{t(label(verify.data?.status??"PENDING"))}</Badge><h1 className="heading mt-4">{t("Payment verified")}</h1><p className="text-muted-foreground mt-3">{money(verify.data?.amount,verify.data?.currency??"VND")} · {t(label(verify.data?.paymentType??"MEMBERSHIP"))}</p><div className="flex gap-5 mt-6"><Link href="/dashboard" className="text-primary">{t("Dashboard")} →</Link><Link href="/dashboard/payments" className="text-primary">{t("Payment history")} →</Link></div></div>}

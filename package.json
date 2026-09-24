@@ -1,0 +1,53 @@
+{
+  "name": "library-platform",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^5.0.0",
+    "@radix-ui/react-dialog": "^1.1.0",
+    "@radix-ui/react-slot": "^1.2.0",
+    "@tanstack/react-query": "^5.0.0",
+    "@uploadthing/react": "^7.3.3",
+    "axios": "^1.12.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.468.0",
+    "next": "^16.0.0",
+    "next-themes": "^0.4.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-hook-form": "^7.0.0",
+    "recharts": "^3.0.0",
+    "server-only": "^0.0.1",
+    "sonner": "^2.0.0",
+    "tailwind-merge": "^3.0.0",
+    "uploadthing": "^7.7.4",
+    "zod": "^4.0.0",
+    "zustand": "^5.0.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.0.0",
+    "@testing-library/jest-dom": "^6.0.0",
+    "@testing-library/react": "^16.0.0",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "eslint": "^9.0.0",
+    "eslint-config-next": "^16.0.0",
+    "jsdom": "^26.0.0",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5.9.0",
+    "vitest": "^5.0.1"
+  },
+  "overrides": {
+    "effect": "3.22.2"
+  }
+}

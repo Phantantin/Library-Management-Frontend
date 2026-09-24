@@ -1,0 +1,1 @@
+import {notFound} from "next/navigation";import {AdminUserDetail} from "@/features/admin/users";export default async function Page({params}:{params:Promise<{id:string}>}){const{id}=await params;if(!/^\d+$/.test(id))notFound();return <AdminUserDetail id={Number(id)}/>}

@@ -1,0 +1,1 @@
+import {BookForm} from "@/features/admin/book-form";import {PageHeader} from "@/components/ui/page-header";export default function Page(){return <><PageHeader eyebrow="Catalog" title="Add book" description="Add the book details, cover image and inventory information."/><BookForm/></>}

@@ -1,0 +1,4 @@
+import {z} from "zod";
+export const bookSchema=z.object({isbn:z.string().trim().min(1).max(255),title:z.string().trim().min(1).max(255),author:z.string().trim().min(1).max(255),genreId:z.coerce.number().int().positive(),publisher:z.string().max(100).optional(),publicationDate:z.string().optional(),language:z.string().max(20).optional(),pages:z.coerce.number().int().min(1).max(50000).optional(),description:z.string().max(2000).optional(),totalCopies:z.coerce.number().int().min(0),availableCopies:z.coerce.number().int().min(0),price:z.coerce.number().min(0).optional(),coverImageUrl:z.union([z.url(),z.literal("")]).optional(),active:z.boolean(),featured:z.boolean()}).refine(v=>v.availableCopies<=v.totalCopies,{message:"Available copies cannot exceed total copies",path:["availableCopies"]});
+export type BookFormValues=z.infer<typeof bookSchema>;
+export type BookFormInput=z.input<typeof bookSchema>;
