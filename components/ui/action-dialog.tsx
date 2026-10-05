@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useAction } from "@/hooks/query";
 import { Button } from "./button";
 import { Modal } from "./dialog";
@@ -19,6 +20,7 @@ interface ActionDialogProps {
   numberField?: { label: string; initial: number; min?: number; max?: number };
   textField?: string;
   disabled?: boolean;
+  errorLink?: { href: string; label: string; match: string[] };
 }
 
 export function ActionDialog({
@@ -29,6 +31,7 @@ export function ActionDialog({
   numberField,
   textField,
   disabled = false,
+  errorLink,
 }: ActionDialogProps) {
   const{t}=useI18n();
   const [open, setOpen] = useState(false);
@@ -75,7 +78,7 @@ export function ActionDialog({
               <textarea required maxLength={500} value={text} onChange={(event) => setText(event.target.value)} />
             </label>
           ) : null}
-          {mutation.error ? <p className="text-sm text-destructive" role="alert">{t(mutation.error.message)}</p> : null}
+          {mutation.error ? <div role="alert" className="space-y-2"><p className="text-sm text-destructive">{t(mutation.error.message)}</p>{errorLink && errorLink.match.some((term) => mutation.error.message.toLowerCase().includes(term.toLowerCase())) && <Link className="inline-block text-sm text-primary underline underline-offset-4" href={errorLink.href}>{t(errorLink.label)}</Link>}</div> : null}
           <div className="flex justify-end gap-3">
             <Button type="button" variant="ghost" onClick={() => setOpen(false)} disabled={mutation.isPending}>{t("Cancel")}</Button>
             <Button variant={danger ? "destructive" : "default"} disabled={mutation.isPending}>

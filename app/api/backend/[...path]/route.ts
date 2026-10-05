@@ -44,25 +44,26 @@ async function handler(req: NextRequest, { params }: Context) {
       "jwt" in data &&
       typeof data.jwt === "string"
     ) {
-      jar.set(cookieName, data.jwt, {
+      const { jwt, ...safe } = data;
+      const outgoing = NextResponse.json(safe, {
+        headers: { "Cache-Control": "no-store" },
+      });
+      outgoing.cookies.set(cookieName, jwt, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
         path: "/",
         maxAge: 86400,
       });
-      const { jwt: _, ...safe } = data;
-      void _;
-      return NextResponse.json(safe, {
-        headers: { "Cache-Control": "no-store" },
-      });
+      return outgoing;
     }
-    if (response.status === 401 && !endpoint.startsWith("/auth/"))
-      jar.delete(cookieName);
-    return NextResponse.json(data, {
+    const outgoing = NextResponse.json(data, {
       status: response.status,
       headers: { "Cache-Control": "no-store" },
     });
+    if (response.status === 401 && !endpoint.startsWith("/auth/"))
+      outgoing.cookies.delete(cookieName);
+    return outgoing;
   } catch {
     return NextResponse.json(
       { message: "The library service is unavailable." },
