@@ -19,6 +19,7 @@ api.interceptors.response.use(
       422: "Please check the form fields.",
       500: "The library service encountered a problem.",
       502: "The library service is currently unavailable.",
+      503: "Online payment is not configured. Please contact the library administrator.",
     };
     const body = axios.isAxiosError<{ message?: string }>(e)
       ? e.response?.data

@@ -156,6 +156,7 @@ export const vietnamese: Record<string, string> = {
   "No description has been provided for this book.": "Sách này chưa có phần mô tả.",
   "Borrow book": "Mượn sách",
   "View membership plans": "Xem các gói thành viên",
+  "Online payment is not configured. Please contact the library administrator.": "Thanh toán trực tuyến chưa được cấu hình. Vui lòng liên hệ quản trị viên thư viện.",
   "No active subscription found!": "Bạn cần có gói thành viên đang hoạt động để mượn sách.",
   "Checkout days exceed membership allowance": "Thời hạn mượn vượt quá giới hạn của gói thành viên. Hãy giảm số ngày mượn hoặc xem lại gói của bạn.",
   "Your membership and borrowing eligibility will be checked by the library.": "Thư viện sẽ kiểm tra gói thành viên và điều kiện mượn của bạn.",
