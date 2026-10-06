@@ -24,13 +24,12 @@ export const label = (s: string) =>
     .replaceAll("_", " ")
     .toLowerCase()
     .replace(/^./, (c) => c.toUpperCase());
-export function safeCheckout(url: string) {
+export function safeVnpayCheckout(url: string) {
   const u = new URL(url);
   if (
     u.protocol !== "https:" ||
-    !["rzp.io", "rzp.me", "razorpay.com", "checkout.razorpay.com"].includes(
-      u.hostname,
-    )
+    !["sandbox.vnpayment.vn", "pay.vnpay.vn"].includes(u.hostname) ||
+    u.pathname !== "/paymentv2/vpcpay.html"
   )
     throw new Error("Unrecognized checkout destination");
   return u.href;

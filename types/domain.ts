@@ -4,7 +4,7 @@ export type BookLoanStatus = "CHECKED_OUT" | "RETURNED" | "OVERDUE" | "LOST" | "
 export type BookLoanType = "CHECKOUT" | "RENEWAL" | "RETURN";
 export type FineStatus = "PENDING" | "PARTIALLY_PAID" | "PAID" | "WAIVED";
 export type FineType = "OVERDUE" | "DAMAGE" | "LOSS" | "PROCESSING";
-export type PaymentGateway = "RAZORPAY" | "STRIPE";
+export type PaymentGateway = "RAZORPAY" | "STRIPE" | "VNPAY";
 export type PaymentStatus = "PENDING" | "SUCCESS" | "FAILED" | "CANCELLED" | "REFUNDED" | "PROCESSING";
 export type PaymentType = "FINE" | "MEMBERSHIP" | "LOST_BOOK_PENALTY" | "DAMAGED_BOOK_PENALTY" | "REFUND";
 export type ReservationStatus = "PENDING" | "AVAILABLE" | "FULFILLED" | "CANCELLED" | "EXPIRED";
@@ -235,14 +235,10 @@ export interface PaymentInitiateResponse {
   paymentId: number | null;
   gateway: PaymentGateway;
   transactionId: string | null;
-  razorpayOrderId: string | null;
+  gatewayOrderId: string | null;
   amount: number;
   description: string | null;
   checkoutUrl: string | null;
   message: string | null;
   success: boolean | null;
-}
-export interface PaymentLinkResponse {
-  payment_link_url: string | null;
-  payment_link_id: string | null;
 }

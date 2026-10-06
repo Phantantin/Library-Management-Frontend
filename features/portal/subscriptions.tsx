@@ -1,4 +1,5 @@
 "use client";
+
 import { useResource, useAction } from "@/hooks/query";
 import { portalApi } from "./api";
 import { PageHeader } from "@/components/ui/page-header";
@@ -6,6 +7,31 @@ import { Loading, ErrorState, Empty } from "@/components/ui/states";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ActionDialog } from "@/components/ui/action-dialog";
-import { safeCheckout } from "@/lib/utils";
-import {useI18n} from "@/providers/i18n-provider";
-export function SubscriptionsPage(){const{t,date,money}=useI18n();const plans=useResource(["plans"],portalApi.plans);const active=useResource(["active-subscription"],portalApi.activeSubscription);const subscribe=useAction(async(id:number)=>{const result=await portalApi.subscribe(id);window.location.assign(safeCheckout(result.checkoutUrl));return result;},"");return <><PageHeader eyebrow="Membership" title="Choose your reading rhythm" description="Membership limits and loan periods come directly from each plan. Payment is activated only after provider verification."/>{active.data&&<section className="panel mb-8 border-primary"><div className="flex flex-wrap justify-between gap-5"><div><Badge tone="success">{t("Current plan")}</Badge><h2 className="text-2xl font-semibold mt-3">{active.data.planName}</h2><p className="text-muted-foreground mt-2">{t("Valid until {date} · {days} days remaining",{date:date(active.data.endDate),days:active.data.daysRemaining??0})}</p></div><ActionDialog danger label="Cancel membership" description="Your active membership will end and borrowing access may change." textField="Reason for cancellation" action={v=>portalApi.cancelSubscription(active.data.id,v.text)}/></div></section>}{plans.isPending?<Loading/>:plans.error?<ErrorState error={plans.error} retry={()=>void plans.refetch()}/>:plans.data?.length?<div className="grid md:grid-cols-2 xl:grid-cols-3 gap-5">{plans.data.filter(p=>p.isActive).sort((a,b)=>(a.displayOrder??0)-(b.displayOrder??0)).map(plan=><article key={plan.id} className="panel flex flex-col"><div>{plan.isFeatured&&<Badge tone="primary">{plan.badgeText||t("Recommended")}</Badge>}<h2 className="text-2xl font-semibold mt-4">{plan.name}</h2><p className="mt-4"><span className="text-3xl font-semibold">{money(plan.price,plan.currency??"VND")}</span><span className="text-muted-foreground text-sm"> / {t("{days} days",{days:plan.durationDays})}</span></p><p className="text-muted-foreground my-5">{plan.description}</p><ul className="space-y-2 text-sm"><li>{t("Borrow up to {count} books",{count:plan.maxBooksAllowed})}</li><li>{t("Keep each book up to {days} days",{days:plan.maxDaysPerBook})}</li></ul></div><Button className="mt-7" disabled={subscribe.isPending||!!active.data} onClick={()=>subscribe.mutate(plan.id)}>{t(active.data?"Membership active":"Subscribe securely")}</Button></article>)}</div>:<Empty title="No membership plans available"/>}{subscribe.error&&<p role="alert" className="text-destructive mt-4">{t(subscribe.error.message)}</p>}</>}
+import { safeVnpayCheckout } from "@/lib/utils";
+import { useI18n } from "@/providers/i18n-provider";
+
+export function SubscriptionsPage() {
+  const { t, date, money } = useI18n();
+  const plans = useResource(["plans"], portalApi.plans);
+  const active = useResource(["active-subscription"], portalApi.activeSubscription);
+  const subscribe = useAction(async (input: { id: number; method: "ALL" | "QR" }) => {
+    const result = await portalApi.subscribe(input.id, input.method);
+    window.location.assign(safeVnpayCheckout(result.checkoutUrl));
+    return result;
+  }, "");
+
+  return <>
+    <PageHeader eyebrow="Membership" title="Choose your reading rhythm" description="Membership limits and loan periods come directly from each plan. Payment is activated only after provider verification." />
+    {active.data && <section className="panel mb-8 border-primary"><div className="flex flex-wrap justify-between gap-5"><div><Badge tone="success">{t("Current plan")}</Badge><h2 className="text-2xl font-semibold mt-3">{active.data.planName}</h2><p className="text-muted-foreground mt-2">{t("Valid until {date} · {days} days remaining", { date: date(active.data.endDate), days: active.data.daysRemaining ?? 0 })}</p></div><ActionDialog danger label="Cancel membership" description="Your active membership will end and borrowing access may change." textField="Reason for cancellation" action={v => portalApi.cancelSubscription(active.data.id, v.text)} /></div></section>}
+    {plans.isPending ? <Loading /> : plans.error ? <ErrorState error={plans.error} retry={() => void plans.refetch()} /> : plans.data?.length ?
+      <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-5">{plans.data.filter(plan => plan.isActive).sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0)).map(plan => {
+        const supportsVnpay = plan.currency?.toUpperCase() === "VND";
+        const disabled = subscribe.isPending || !!active.data || !supportsVnpay;
+        return <article key={plan.id} className="panel flex flex-col"><div>{plan.isFeatured && <Badge tone="primary">{plan.badgeText || t("Recommended")}</Badge>}<h2 className="text-2xl font-semibold mt-4">{plan.name}</h2><p className="mt-4"><span className="text-3xl font-semibold">{money(plan.price, plan.currency ?? "VND")}</span><span className="text-muted-foreground text-sm"> / {t("{days} days", { days: plan.durationDays })}</span></p><p className="text-muted-foreground my-5">{plan.description}</p><ul className="space-y-2 text-sm"><li>{t("Borrow up to {count} books", { count: plan.maxBooksAllowed })}</li><li>{t("Keep each book up to {days} days", { days: plan.maxDaysPerBook })}</li></ul></div>
+          {!supportsVnpay && <p className="text-sm text-warning mt-5" role="note">{t("VNPAY only accepts VND. Ask an administrator to set this plan's price in VND before subscribing.")}</p>}
+          <div className="mt-7 grid gap-2"><Button disabled={disabled} onClick={() => subscribe.mutate({ id: plan.id, method: "ALL" })}>{t(active.data ? "Membership active" : "Pay with VNPAY")}</Button><Button variant="outline" disabled={disabled} onClick={() => subscribe.mutate({ id: plan.id, method: "QR" })}>{t("Pay with VNPAY QR")}</Button></div>
+        </article>;
+      })}</div> : <Empty title="No membership plans available" />}
+    {subscribe.error && <p role="alert" className="text-destructive mt-4">{t(subscribe.error.message)}</p>}
+  </>;
+}
