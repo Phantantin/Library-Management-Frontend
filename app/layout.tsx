@@ -7,7 +7,7 @@ import {localeCookie,type Locale} from "@/lib/i18n";
 
 export const metadata: Metadata = {
   title: { default: "Folio Library", template: "%s | Folio Library" },
-  description: "Discover your next read and manage your library membership, borrowing and reservations.",
+  description: "Discover your next read and manage your library account, borrowing and reservations.",
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
